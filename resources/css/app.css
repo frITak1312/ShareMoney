@@ -1,0 +1,44 @@
+@import 'bootstrap/dist/css/bootstrap.min.css';
+@import '/resources/css/animate.min.css';
+@import '/resources/css/bs-theme-overrides.css';
+
+
+:root {
+    --background-color: #fdfcf7 !important;
+    --light-green: #d5f4e6 !important;
+    --dark-green: #cc5fc0 !important;
+    --sky-blue: #56b5bd !important;
+    --3d-look: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+*:not(input) {
+    text-decoration: none;
+    caret-color: transparent;
+}
+
+input {
+    caret-color: black !important;
+}
+
+.back-arrow {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    background: #dedcde;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: background 0.2s, box-shadow 0.2s;
+}
+
+.back-arrow:hover {
+    background: rgba(0, 0, 0, 0.05);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
