@@ -1,4 +1,5 @@
 <img
-    src="{{ empty(auth()->user()->avatar_path) ? asset('images/profilePictures/default-avatar.png') : asset('storage/' . auth()->user()->avatar_path)}}"
+    src="{{ empty(auth()->user()->avatar_path) ? asset('images/default-avatar.png') : asset(Storage::url(auth()->user()->avatar_path))}}"
     alt="user-profile-photo"
-    {{$attributes}}/>
+    loading="lazy"
+    {{$attributes}} />

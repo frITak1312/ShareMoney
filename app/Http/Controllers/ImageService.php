@@ -31,9 +31,9 @@ class ImageService extends Controller
             return; // Pokud není cesta, není co mazat
         }
 
-        $fullPath = public_path('storage/'.$imagePath);
-        if (file_exists($fullPath)) {
-            unlink($fullPath);
+        // Mazání přes Storage disk, ne přes public_path
+        if (Storage::disk('public')->exists($imagePath)) {
+            Storage::disk('public')->delete($imagePath);
         }
     }
 }

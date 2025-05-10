@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureUserIsAuthenticated;
+use App\Http\Middleware\StoreReturnUrl;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -12,7 +14,10 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'loggedIn' => \App\Http\Middleware\EnsureUserIsAuthenticated::class,
+            'loggedIn' => EnsureUserIsAuthenticated::class,
+        ]);
+        $middleware->append([
+            StoreReturnUrl::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

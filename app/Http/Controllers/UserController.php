@@ -39,7 +39,7 @@ class UserController extends Controller
             $user->password = Hash::make($validatedData['password']);
         }
         // Operování s profilovou fotkou
-        if ($request->input('remove_avatar') === "1") {
+        if ($request->input('remove_avatar') === '1') {
             ImageService::deleteImage($user->avatar_path);
             $user->avatar_path = null; // Odebrání cesty z databáze
         } elseif ($request->hasFile('avatar')) {
@@ -55,7 +55,6 @@ class UserController extends Controller
         // aktualizace uživatele v session
         Auth::setUser($user);
 
-        return redirect()->route('profileDetailPage', $user)->with('success', 'Profil byl úspěšně aktualizován.');
+        return back()->with('success', 'Profil byl úspěšně aktualizován.');
     }
 }
-

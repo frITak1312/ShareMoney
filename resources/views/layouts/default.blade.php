@@ -19,7 +19,7 @@
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav">
                     <li class="nav-item"><a class="nav-link"
-                                            href="{{route('profileDetailPage',['user' => auth()->user()])}}"
+                                            href="{{route('profileDetailPage',['user' => auth()->user()],)}}"
                                             style="font-size: 16px;color: var(--bs-black);">Můj
                             profil<i class="far fa-user" style="margin-left: 10px;"></i></a></li>
                 </ul>
@@ -31,7 +31,7 @@
     class="d-flex position-relative d-lg-flex flex-column justify-content-center align-items-center justify-content-lg-center align-items-lg-center"
     style="margin: 50px 80px 0;">
     @if(! request()-> is("dashboard"))
-        <a href="{{url()->previous()}}" class="back-arrow">
+        <a href="{{session('return_url', route('dashboardPage'))}}" class="back-arrow">
             <i class="fas fa-arrow-left"></i>
             Zpět
         </a>
