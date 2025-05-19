@@ -21,15 +21,22 @@ class User extends Authenticatable
             'password',
         ];
 
+    public function getFullNameAttribute()
+    {
+        return strtoupper($this->name.' '.$this->surname);
+    }
+
+    public function accounts()
+    {
+        return $this->belongsToMany(Account::class, 'account_memberships')
+            ->using(AccountMemberships::class)
+            ->withPivot('role');
+    }
+
     protected function casts(): array
     {
         return [
             'password' => 'hashed',
         ];
-    }
-
-    public function getFullNameAttribute()
-    {
-        return strtoupper($this->name.' '.$this->surname);
     }
 }

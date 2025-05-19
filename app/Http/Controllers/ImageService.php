@@ -27,7 +27,7 @@ class ImageService extends Controller
 
     public static function deleteImage($imagePath)
     {
-        if (!$imagePath) {
+        if (! $imagePath) {
             return; // Pokud není cesta, není co mazat
         }
 
@@ -37,4 +37,3 @@ class ImageService extends Controller
         }
     }
 }
-

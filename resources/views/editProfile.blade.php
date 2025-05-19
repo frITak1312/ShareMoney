@@ -44,7 +44,7 @@
             session('success')
         )
             <x-toast>
-                nude
+                Změny byly uloženy
             </x-toast>
 
         @endif
