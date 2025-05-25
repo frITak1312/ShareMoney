@@ -18,10 +18,29 @@
         <div>
             <div class="collapse navbar-collapse" id="navcol-1">
                 <ul class="navbar-nav">
-                    <li class="nav-item"><a class="nav-link"
-                                            href="{{route('profileDetailPage',['user' => auth()->user()],)}}"
-                                            style="font-size: 16px;color: var(--bs-black);">Můj
-                            profil<i class="far fa-user" style="margin-left: 10px;"></i></a></li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" role="button"
+                           data-bs-toggle="dropdown">
+                            <i class="fa fa-user"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end" style="min-width: unset">
+                            <li>
+                                <a class="dropdown-item"
+                                   href="{{route('profileDetailPage',['user' => auth()->user()],)}}">
+                                    <i class="fa fa-edit"></i> Můj profil
+                                </a></li>
+                            <li>
+                                <hr class="dropdown-divider">
+                            </li>
+                            <li>
+                                <x-form method="post" class="mb-0" action="{{route('logout')}}">
+                                    <button class="dropdown-item" type="submit">
+                                        <i class="fa fa-sign-out-alt"></i> Odhlásit se
+                                    </button>
+                                </x-form>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>

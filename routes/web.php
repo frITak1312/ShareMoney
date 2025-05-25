@@ -5,6 +5,10 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
+/* Logout */
+Route::post('/logout', [AuthController::class, 'logout'])
+    ->name('logout');
+
 /* Pohyb po webu */
 Route::get('/', fn () => view('login'))
     ->name('loginPage');
