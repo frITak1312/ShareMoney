@@ -27,6 +27,10 @@ class Account extends Model
     {
         return $this->name;
     }
+    public function getOwnerNameAttribute()
+    {
+        return $this->users()->wherePivot('role', 'admin')->first()->full_name;
+    }
 
     public function users()
     {

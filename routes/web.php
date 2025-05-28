@@ -34,3 +34,8 @@ Route::post('/register', [AuthController::class, 'register'])
 /* Vytvoření účtu */
 Route::post('/createAccount', [AccountController::class, 'create'])
     ->name('createAccount');
+/* Editace účtu */
+/* Smazání účtu */
+/* Opustění účtu */
+Route::delete('/removeUserFromAccount/{account}', [AccountController::class, 'removeUser'])
+    ->name('removeUserFromAccount');

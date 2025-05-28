@@ -42,5 +42,17 @@ input {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
+td {
+    word-break: break-word;
+}
 
+.divider {
+    border-bottom: 1px solid #e5e7eb;
+}
 
+.avatar {
+    vertical-align: middle;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}

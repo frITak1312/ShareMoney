@@ -33,4 +33,16 @@ class AccountController extends Controller
 
         return redirect()->route('accountDetailPage', $account)->with('success', 'Účet byl úspěšně vytvořen.');
     }
+
+    public function removeUser(Account $account)
+    {
+        $user = auth()->user();
+
+        if ($account->users()->where('user_id', $user->id)->exists()) {
+            $account->users()->detach($user->id);
+            return redirect()->route('dashboardPage')->with('success', 'Opustili jste účet.');
+        }
+
+        return redirect()->route('dashboardPage')->with('error', 'Nemáte oprávnění opustit tento účet.');
+    }
 }

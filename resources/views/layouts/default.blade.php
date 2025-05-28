@@ -7,6 +7,7 @@
           href="https://fonts.googleapis.com/css?family=Alatsi&amp;subset=cyrillic-ext,latin-ext&amp;display=swap">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    @yield('custom-css')
 </head>
 <body class="bg-primary" style="font-family: Alatsi, sans-serif;">
 <nav class="navbar navbar-expand-md bg-secondary d-flex justify-content-between align-items-center">
