@@ -40,14 +40,6 @@
             </div>
         </section>
         <button class="btn btn-outline-success" type="submit" style="margin-top: 60px;">Uložit změny</button>
-        @if(
-            session('success')
-        )
-            <x-toast>
-                Změny byly uloženy
-            </x-toast>
-
-        @endif
     </x-form>
 @endsection
 @section("scripts")

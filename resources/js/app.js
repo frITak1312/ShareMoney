@@ -1,3 +1,5 @@
 import "./bootstrap";
 import "./bs-init.js";
-import "./bootstrap.min.js";
+import * as bootstrap from "bootstrap";
+
+window.bootstrap = bootstrap;

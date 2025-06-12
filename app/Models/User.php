@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
+
 class User extends Authenticatable
 {
     protected $fillable
@@ -21,7 +22,7 @@ class User extends Authenticatable
             'password',
         ];
 
-    public function getFullNameAttribute()
+    public function getFullNameAttribute(): string
     {
         return strtoupper($this->name.' '.$this->surname);
     }
@@ -39,4 +40,10 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public static function getUserByUsername(string $username): ?User
+    {
+        return User::where('username', $username)->first();
+    }
 }
+

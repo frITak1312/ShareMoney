@@ -5,7 +5,14 @@
     'style' => 'position: absolute; top: 10px; right: 10px; z-index: 999;',
     'id' => 'toast',
 ]) }} role="alert">
-    {{ $slot }}
+        @if(session("success"))
+        {{session("success")}}
+
+    @endif
+    @if(session("error"))
+        {{session("error")}}
+    @endif
+
 </span>
 
 <script>

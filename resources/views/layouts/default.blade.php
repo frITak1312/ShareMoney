@@ -57,6 +57,9 @@
         </a>
     @endif
     <h1 class="display-4">@yield("heading")</h1>
+    @if(session('success'))
+        <x-toast />
+    @endif
     @yield("content")
 </main>
 @yield("scripts")

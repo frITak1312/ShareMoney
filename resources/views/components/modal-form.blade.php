@@ -1,6 +1,6 @@
 @props(['heading', 'action'])
 
-<div class='modal fade' id='myModal' tabindex='-1' aria-labelledby='modalLabel' aria-hidden='true'>
+<div class='modal fade' id="{{ $attributes->get('id') }}" tabindex='-1' aria-labelledby='modalLabel' aria-hidden='true'>
     <div class='modal-dialog modal-dialog-centered'>
         <div class='modal-content'>
             <div class='modal-header'>
@@ -8,6 +8,10 @@
                 <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Zavřít'></button>
             </div>
             <div class='modal-body'>
+                {{-- Výpis chybové hlášky pokud je určena pro tento modal --}}
+                @if(session('error') && session('modal') === $attributes->get('id'))
+                    <div class="alert alert-danger mt-2">{{ session('error') }}</div>
+                @endif
                 <x-form method='post' :action="$action">
                     {{$slot}}
                 </x-form>

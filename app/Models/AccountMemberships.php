@@ -14,15 +14,6 @@ class AccountMemberships extends Pivot
         'role',
     ];
 
-    public function isAdmin()
-    {
-        return $this->role === 'admin';
-    }
-
-    public function isModerator()
-    {
-        return $this->role === 'moderator';
-    }
 }
 
 

@@ -12,21 +12,12 @@ class Account extends Model
             'balance',
         ];
 
-    public function getBalance()
-    {
-        return $this->balance;
-    }
-
     public function setBalance($balance): void
     {
         $this->balance = $balance;
         $this->save();
     }
 
-    public function getName()
-    {
-        return $this->name;
-    }
     public function getOwnerNameAttribute()
     {
         return $this->users()->wherePivot('role', 'admin')->first()->full_name;
@@ -37,5 +28,12 @@ class Account extends Model
         return $this->belongsToMany(User::class, 'account_memberships')
             ->using(AccountMemberships::class)
             ->withPivot('role', 'joined_at');
+    }
+
+    public function getUserRole($userId)
+    {
+        $membership = $this->users->firstWhere('id', $userId);
+
+        return $membership?->pivot?->role;
     }
 }

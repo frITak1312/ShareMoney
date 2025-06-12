@@ -36,6 +36,12 @@ Route::post('/createAccount', [AccountController::class, 'create'])
     ->name('createAccount');
 /* Editace účtu */
 /* Smazání účtu */
+Route::delete('/deleteAccount/{account}', [AccountController::class, 'deleteAccount'])
+    ->name('deleteAccount');
 /* Opustění účtu */
 Route::delete('/removeUserFromAccount/{account}', [AccountController::class, 'removeUser'])
     ->name('removeUserFromAccount');
+
+/* Přidání uživatele do účtu */
+Route::post('/addMemberToAccount/{account}', [AccountController::class, 'addMember'])
+    ->name('addMemberToAccount');
