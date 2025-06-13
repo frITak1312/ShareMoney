@@ -44,7 +44,10 @@
         </div>
     </div>
     <x-modal-form heading="Nový účet" id="myModal" :action="route('createAccount')">
-        <input type="text" name="name" placeholder="Název účtu" maxlength="15">
+        <label class="">
+            Zadejte název účtu:
+            <input class="" type="text" name="name" placeholder="Název účtu" maxlength="15">
+        </label>
         <button type="submit" class="btn btn-success w-100">Vytvořit nový účet</button>
     </x-modal-form>
 @endsection

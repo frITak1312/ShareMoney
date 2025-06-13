@@ -5,35 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Account;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
 {
     public function index(Account $account)
     {
         return view('account', compact('account'));
-    }
-
-    public function create()
-    {
-        $validatedData = request()->validate([
-            'name' => 'required|string|max:15',
-        ], [
-            'name.required' => 'Název účtu je povinný.',
-            'name.string' => 'Název účtu musí být text.',
-            'name.max' => 'Název účtu nesmí být delší než 15 znaků.',
-        ]);
-
-        $account = Account::create([
-            'name' => $validatedData['name'],
-        ]);
-
-        $account->users()->attach(auth()->id(), [
-            'role' => 'admin',
-        ]);
-
-        $account->save();
-
-        return redirect()->route('accountDetailPage', $account)->with('success', 'Účet byl úspěšně vytvořen.');
     }
 
     public function removeUser(Account $account)
@@ -53,17 +31,23 @@ class AccountController extends Controller
 
     public function addMember(Account $account, Request $request)
     {
-        $userName = $request->input('userName');
-        $userName = ltrim($userName, '@');
-        if (empty($userName)) {
+        $validator = Validator::make($request->all(), [
+            'userName' => 'required',
+        ], [
+            'userName.required' => 'Uživatelské jméno nesmí být prázdné.',
+        ]);
+        if ($validator->fails()) {
             return redirect()->back()
-                ->with('error', 'Uživatelské jméno nesmí být prázdné.')
+                ->withErrors($validator)
                 ->with('modal', 'addMemberModal');
         }
 
+        $userName = $request->input('userName');
+        $userName = ltrim($userName, '@');
+
         if (! User::getUserByUsername($userName)) {
             return redirect()->back()
-                ->with('error', 'Uživatel s tímto uživatelským jménem neexistuje.')
+                ->withErrors(['userName' => 'Uživatel s tímto uživatelským jménem neexistuje.'])
                 ->with('modal', 'addMemberModal');
         }
 
@@ -72,14 +56,14 @@ class AccountController extends Controller
         // Kontrola: přidává sám sebe
         if ($user->id === auth()->id()) {
             return redirect()->back()
-                ->with('error', 'Nemůžete přidat sám sebe.')
+                ->withErrors(['userName' => 'Nemůžete přidat sám sebe.'])
                 ->with('modal', 'addMemberModal');
         }
 
         // Kontrola: už je členem
         if ($account->users()->where('user_id', $user->id)->exists()) {
             return redirect()->back()
-                ->with('error', 'Tento uživatel je již členem účtu.')
+                ->withErrors(['userName' => 'Tento uživatel je již členem účtu.'])
                 ->with('modal', 'addMemberModal');
         }
 
@@ -109,5 +93,28 @@ class AccountController extends Controller
         $account->delete();
 
         return redirect()->route('dashboardPage')->with('success', 'Účet byl úspěšně smazán.');
+    }
+
+    public function create()
+    {
+        $validatedData = request()->validate([
+            'name' => 'required|string|max:15',
+        ], [
+            'name.required' => 'Název účtu je povinný.',
+            'name.string' => 'Název účtu musí být text.',
+            'name.max' => 'Název účtu nesmí být delší než 15 znaků.',
+        ]);
+
+        $account = Account::create([
+            'name' => $validatedData['name'],
+        ]);
+
+        $account->users()->attach(auth()->id(), [
+            'role' => 'admin',
+        ]);
+
+        $account->save();
+
+        return redirect()->route('accountDetailPage', $account)->with('success', 'Účet byl úspěšně vytvořen.');
     }
 }

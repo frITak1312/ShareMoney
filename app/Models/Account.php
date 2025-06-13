@@ -18,7 +18,7 @@ class Account extends Model
         $this->save();
     }
 
-    public function getOwnerNameAttribute()
+    public function getAdminNameAttribute()
     {
         return $this->users()->wherePivot('role', 'admin')->first()->full_name;
     }
@@ -27,7 +27,8 @@ class Account extends Model
     {
         return $this->belongsToMany(User::class, 'account_memberships')
             ->using(AccountMemberships::class)
-            ->withPivot('role', 'joined_at');
+            ->withPivot('role', 'joined_at')
+            ->orderByRaw("FIELD(role, 'admin', 'moderator', 'member')");
     }
 
     public function getUserRole($userId)

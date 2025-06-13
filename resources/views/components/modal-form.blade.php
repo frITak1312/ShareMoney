@@ -1,8 +1,8 @@
-@props(['heading', 'action'])
+@props(['heading', 'action' => null])
 
 <div class='modal fade' id="{{ $attributes->get('id') }}" tabindex='-1' aria-labelledby='modalLabel' aria-hidden='true'>
     <div class='modal-dialog modal-dialog-centered'>
-        <div class='modal-content'>
+        <div class='modal-content text-center'>
             <div class='modal-header'>
                 <h5 class='modal-title' id='modalLabel'>{{$heading}}</h5>
                 <button type='button' class='btn-close' data-bs-dismiss='modal' aria-label='Zavřít'></button>
@@ -22,11 +22,25 @@
 
 <script>
     document.addEventListener("DOMContentLoaded", function() {
-        const modalBody = document.querySelector(".modal-body");
-        const inputs = modalBody.querySelectorAll("input");
+        const modalId = @json($attributes->get('id'));
+        const modalElement = document.getElementById(modalId);
 
-        inputs.forEach(input => {
-            input.classList.add("form-control", "mb-3");
-        });
+        if (modalElement) {
+            // Přidej třídy všem inputům v modalu
+            const inputs = modalElement.querySelectorAll("input");
+            inputs.forEach(input => {
+                input.classList.add("mb-3", "container-fluid");
+            });
+
+            modalElement.addEventListener("hidden.bs.modal", function() {
+                const errorDiv = modalElement.querySelector(".alert-danger");
+                if (errorDiv) errorDiv.style.display = "none";
+            });
+            //Reopen modalu pokud je v session
+            @if(session('modal') === $attributes->get('id'))
+            const modal = new bootstrap.Modal(modalElement);
+            modal.show();
+            @endif
+        }
     });
 </script>

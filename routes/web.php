@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
@@ -45,3 +46,8 @@ Route::delete('/removeUserFromAccount/{account}', [AccountController::class, 're
 /* Přidání uživatele do účtu */
 Route::post('/addMemberToAccount/{account}', [AccountController::class, 'addMember'])
     ->name('addMemberToAccount');
+
+/* Vložení peněz */
+Route::post('/depositMoney/{account}', [TransactionController::class, 'depositMoney'])
+    ->name('depositMoney');
+

@@ -2,7 +2,7 @@
 
 <span {{ $attributes->merge([
     'class' => "alert alert-$type",
-    'style' => 'position: absolute; top: 10px; right: 10px; z-index: 999;',
+    'style' => 'position: absolute; bottom: 10px; left: 10px; z-index: 999;',
     'id' => 'toast',
 ]) }} role="alert">
         @if(session("success"))
