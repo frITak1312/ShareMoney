@@ -1,6 +1,10 @@
 @extends("layouts.default")
 @section("heading", "Editace profilu")
 @section("content")
+    @php
+        $session = @session("return_url");
+        echo "$session"
+    @endphp
     <x-form class="text-center" style="margin-top: 50px;" enctype="multipart/form-data" method="post"
             action="{{route('editProfile', ['user' => auth()->user()])}}">
         @method("put")
@@ -43,6 +47,6 @@
     </x-form>
 @endsection
 @section("scripts")
-    <script src="{{ asset('js/editProfilePhoto.js') }}"></script>
+    @vite("resources/js/editProfilePhoto.js")
 @endsection
 

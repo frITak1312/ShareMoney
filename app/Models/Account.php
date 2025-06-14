@@ -12,12 +12,6 @@ class Account extends Model
             'balance',
         ];
 
-    public function setBalance($balance): void
-    {
-        $this->balance = $balance;
-        $this->save();
-    }
-
     public function getAdminNameAttribute()
     {
         return $this->users()->wherePivot('role', 'admin')->first()->full_name;
@@ -37,4 +31,16 @@ class Account extends Model
 
         return $membership?->pivot?->role;
     }
+
+    public function transactions()
+    {
+        return Transaction::where(function ($query) {
+            $query->where('account_id', $this->id)
+                ->orWhere(function ($query2) {
+                    $query2->where('recipient_account_id', $this->id)
+                        ->where('amount', '>', 0);
+                });
+        })->orderBy('created_at', 'desc')->get();
+    }
+
 }

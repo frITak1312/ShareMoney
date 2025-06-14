@@ -20,15 +20,12 @@ class StoreReturnUrl
             ! $request->is('/') &&
             ! $request->ajax()) {
 
-            // Pokud jsme na editProfile, neukládáme URL
-            if (! $request->is('editProfile/*')) {
-                session(['return_url' => url()->full()]);
-            }
-        }
+            session(['return_url' => url()->previous()]);
 
-        // Pokud nemáme return_url, nastavíme dashboard
-        if (! session()->has('return_url')) {
-            session(['return_url' => route('dashboardPage')]);
+            if (str_contains(session('return_url'), 'editProfile')) {
+                session()->forget('return_url');
+            }
+
         }
 
         return $next($request);

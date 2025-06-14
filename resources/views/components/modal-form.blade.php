@@ -26,7 +26,7 @@
         const modalElement = document.getElementById(modalId);
 
         if (modalElement) {
-            // Přidej třídy všem inputům v modalu
+            // třídy všem inputům v modalu
             const inputs = modalElement.querySelectorAll("input");
             inputs.forEach(input => {
                 input.classList.add("mb-3", "container-fluid");

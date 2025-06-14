@@ -3,13 +3,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Share Money</title>
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css?family=Alatsi&amp;subset=cyrillic-ext,latin-ext&amp;display=swap">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Kanit:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Roboto:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @yield('custom-css')
 </head>
-<body class="bg-primary" style="font-family: Alatsi, sans-serif;">
+<body class="bg-primary" style="font-family: Kanit, sans-serif;">
 <nav class="navbar navbar-expand-md bg-secondary d-flex justify-content-between align-items-center">
     <div class="container-fluid">
         <a href="{{ route('dashboardPage') }}"
@@ -51,7 +54,7 @@
     class="d-flex position-relative d-lg-flex flex-column justify-content-center align-items-center justify-content-lg-center align-items-lg-center"
     style="margin: 50px 80px 0;">
     @if(! request()-> is("dashboard"))
-        <a href="{{session('return_url', route('dashboardPage'))}}" class="back-arrow">
+        <a href="{{session('return_url', route("dashboardPage"))}}" class="back-arrow">
             <i class="fas fa-arrow-left"></i>
             Zpět
         </a>

@@ -61,3 +61,28 @@
 .zoom-hover:hover {
     transform: scale(1.05); /* Mírné přiblížení o 5 % */
 }
+
+.export-btn,
+.export-btn:focus,
+.export-btn:active {
+    background: #f0f0f0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    color: #212529;
+}
+
+.export-btn:hover {
+    background: #c9c9c9 !important;
+}
+
+.negative-row #amountTd {
+    color: rgb(242, 87, 87) !important;
+}
+
+.positive-row #amountTd {
+    color: rgb(6, 210, 6) !important;
+}
+
+#transaction-history-table {
+    font-size: large;
+}

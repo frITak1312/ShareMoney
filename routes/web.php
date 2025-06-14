@@ -51,3 +51,6 @@ Route::post('/addMemberToAccount/{account}', [AccountController::class, 'addMemb
 Route::post('/depositMoney/{account}', [TransactionController::class, 'depositMoney'])
     ->name('depositMoney');
 
+/* Platba */
+Route::post('/sendPayment/{account}', [TransactionController::class, 'sendPayment'])
+    ->name('sendPayment');
