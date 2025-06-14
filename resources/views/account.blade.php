@@ -3,6 +3,7 @@
 @section("custom-css")
     @vite(["resources/css/accountPage.css"])
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.bootstrap5.css" />
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
 @endsection
 
 @section("heading", $account->name)
@@ -12,43 +13,64 @@
         $userId = auth()->id();
         $role = $account->getUserRole($userId);
         $accountMembers = $account->users;
+        $transactions = $account->transactions();
     @endphp
 
     <h3 style="color: rgb(163,163,163);font-size: 20px;margin-bottom: 40px;">
-        vlastník: &nbsp;{{ $account->owner_name }}
+        vlastník: &nbsp;{{ $account->admin_name }}
     </h3>
 
     <p class="lead text-center text-success" style="font-size: 45px;margin-bottom: 26px;">
         {{ $account->balance }} CZK
     </p>
-
-    <div class="d-flex d-xl-flex gap-5">
-        <button class="btn btn-outline-success" type="button">Zadat platbu</button>
+    <div class="d-flex gap-5 align-items-center">
+        @if($role === "member")
+            <span data-toggle="tooltip"
+                  title="Jen admin a moderátor mohou zadávat platby.">
+            <button class="btn btn-outline" id="send-payment-btn" style="pointer-events: none" disabled>
+                Zadat platbu
+            </button>
+            </span>
+        @else
+            <button class="btn btn-outline-success" id="send-payment-btn" type="button">Zadat platbu</button>
+        @endif
         <button class="btn btn-outline-light" id="deposit-money-btn" type="button">Vložit peníze</button>
     </div>
-
     <!-- Tabulka výpisu -->
     <div class="container mt-5" style="width: 50%;">
         <div class="table-responsive">
-            <table id="example" class="table table-striped nowrap">
+            <table id="transaction-history-table" class="table table-striped nowrap">
                 <thead>
                 <tr>
                     <th>Datum</th>
+                    <th>Typ</th>
                     <th>Popis</th>
                     <th>Částka</th>
-                    <th>Odeslal/Vložil</th>
+                    <th>Odesílatel/Vložil</th>
                 </tr>
                 </thead>
                 <tbody>
-                <!-- Dummy data -->
-                @for($i = 0; $i < 4; $i++)
-                    <tr>
-                        <td>22.05.2025</td>
-                        <td>Platba za úklid</td>
-                        <td>500 CZK</td>
-                        <td>Jan Marek</td>
+                @foreach($transactions as $transaction)
+                    <tr class={{$transaction->amount > 0 ? "negative-row" : "positive-row"}}>
+                        <td>{{date_format(date_create($transaction->created_at), "d.m.y H:i")}}</td>
+                        <td>
+                            @if($transaction->type_id === 1)
+                                Platba
+                            @else
+                                Vklad
+                            @endif
+                        </td>
+                        <td>{{$transaction->description}}</td>
+                        <td id="amountTd">{{$transaction->amount}} CZK</td>
+                        <td>
+                            @if ($transaction->user)
+                                {{ $transaction->user->full_name }}
+                            @else
+                                {{ $transaction->recipient_account_id }}
+                            @endif
+                        </td>
                     </tr>
-                @endfor
+                @endforeach
                 </tbody>
             </table>
         </div>
@@ -62,7 +84,7 @@
             </div>
         @endif
 
-        @if($role !== "user")
+        @if($role !== "member")
             <div class="text-center mt-4">
                 <button class="btn-outline-info btn btn-lg mb-3" id="add-member-btn">
                     Přidat člena <i class="fas fa-plus-square"></i>
@@ -93,7 +115,6 @@
                 </a>
             @endforeach
         </nav>
-
         <footer>
             <p>
                 @if($role === 'admin')
@@ -109,7 +130,7 @@
         </footer>
     </div>
 
-    <!-- Modály -->
+    <!-- Opustit učet modal -->
     <x-modal-form heading="Opustit účet" :action="route('removeUserFromAccount', $account)" id="leaveAccountModal"
                   class="modal-lg">
         @method("DELETE")
@@ -119,7 +140,7 @@
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Ne</button>
         </div>
     </x-modal-form>
-
+    <!-- Smazat učet (pouze admin) modal -->
     @if($role === 'admin')
         <x-modal-form heading="Smazat účet" :action="route('deleteAccount', $account)" id="deleteAccountModal"
                       class="modal-lg">
@@ -131,7 +152,7 @@
             </div>
         </x-modal-form>
     @endif
-
+    <!-- Přidat člena (admin a moderator) modal  -->
     <x-modal-form heading="Přidat člena" :action="route('addMemberToAccount', $account)" id="addMemberModal"
                   class="modal-lg">
         <label>
@@ -145,7 +166,7 @@
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Zpět</button>
         </div>
     </x-modal-form>
-
+    <!-- vložit peníze modal -->
     <x-modal-form heading="Vložit peníze" :action="route('depositMoney', $account)" id="depositMoneyModal"
                   class="modal-lg">
         <label for="depositAmount">Částka:
@@ -167,7 +188,7 @@
             <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Zpět</button>
         </div>
     </x-modal-form>
-
+    <!-- Info o uživateli modal -->
     <x-modal-form heading="Informace o uživateli" id="userInfoModal"
                   class="modal-lg">
         <table class="table table-hover table-striped">
@@ -189,6 +210,38 @@
             </tr>
         </table>
     </x-modal-form>
+    <!-- Zadat platbu (admin a moderator) modal -->
+    <x-modal-form heading="Zadat platbu" id="sendPaymentModal" class="modal-lg"
+                  :action="route('sendPayment', $account)">
+        <label for="recipient"> Číslo příjemce:
+            <input type="number" id="recipient" name="recipient" placeholder="00000000" required
+                   value="{{ old('recipient') }}">
+        </label>
+        @error('recipient')
+        <x-error :message="$message" />
+        @enderror
+        <label for="paymentAmount">Částka:
+            <input type="number" id="paymentAmount" name="amount" min="1" max="{{$account->balance}}"
+                   placeholder="Částka v CZK" required
+                   value="{{ old('amount') }}">
+        </label>
+        @error('amount')
+        <x-error :message="$message" />
+        @enderror
+
+        <label for="textareaPayment">Popis (nepovinný):
+            <input name="description" id="textareaPayment" maxlength="30"
+                   placeholder="Platba za ..." value="{{ old('description') }}">
+        </label>
+        @error('description')
+        <x-error :message="$message" />
+        @enderror
+
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-secondary">Zadat</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Zpět</button>
+        </div>
+    </x-modal-form>
 
 @endsection
 
@@ -196,44 +249,11 @@
     <script src="https://code.jquery.com/jquery-3.7.1.js"></script>
     <script src="https://cdn.datatables.net/2.3.1/js/dataTables.js"></script>
     <script src="https://cdn.datatables.net/2.3.1/js/dataTables.bootstrap5.js"></script>
-
-    <script>
-        $(document).ready(function() {
-            $("#example").DataTable({
-                responsive: true,
-                language: {
-                    search: "Hledat:",
-                    lengthMenu: "_MENU_ záznamů na stránku",
-                    info: "Zobrazují se záznamy _START_ až _END_ z _TOTAL_",
-                    infoEmpty: "",
-                    infoFiltered: "filtrováno z _MAX_ celkových záznamů",
-                    zeroRecords: "Nenalezeny žádné odpovídající záznamy",
-                    paginate: {
-                        next: "Další",
-                        previous: "Předchozí"
-                    }
-                }
-            });
-
-            // Otevření modálů
-            $("#leave-account-btn").click(() => new bootstrap.Modal("#leaveAccountModal").show());
-            $("#add-member-btn").click(() => new bootstrap.Modal("#addMemberModal").show());
-            $("#delete-account-btn").click(() => new bootstrap.Modal("#deleteAccountModal").show());
-            $("#deposit-money-btn").click(() => new bootstrap.Modal("#depositMoneyModal").show());
-            // Modal s info o uživateli
-            $(".user-detail-box").click(function() {
-                const name = $(this).data("name");
-                const username = $(this).data("username");
-                const role = $(this).data("role");
-                const joined = $(this).data("joined");
-
-                $("#modal-name").text(name);
-                $("#modal-username").text("@" + username);
-                $("#modal-role").text(role);
-                $("#modal-joined").text(joined);
-
-                new bootstrap.Modal("#userInfoModal").show();
-            });
-        });
-    </script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/pdfmake.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.7/vfs_fonts.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.html5.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/2.4.2/js/buttons.print.min.js"></script>
+    @vite("resources/js/accountDetail.js")
 @endsection
