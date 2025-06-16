@@ -6,12 +6,12 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class EnsureUserIsAuthenticated
+class Authenticated
 {
     public function handle(Request $request, Closure $next)
     {
-        if (! Auth::check() || ! Auth::user()->is($request->route('user'))) {
-            abort(404);
+        if (! Auth::check()) {
+            return redirect()->route('loginPage');
         }
 
         return $next($request);

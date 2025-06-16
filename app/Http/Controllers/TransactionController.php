@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Account;
 use App\Models\Transaction;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
@@ -18,21 +19,25 @@ class TransactionController extends Controller
             ], [
                 'amount.required' => 'Částka je povinná.',
                 'amount.numeric' => 'Částka musí být číslo.',
-                'amount.min' => 'Částka musí být větší než 0.',
+                'amount.min' => 'Částka musí být aspon 1.',
                 'description.string' => 'Popis musí být text.',
                 'description.max' => 'Popis nesmí být delší než 255 znaků.',
             ]);
+            try {
+                $account->balance += $validatedData['amount'];
+                $account->save();
 
-            $account->balance += $validatedData['amount'];
-            $account->save();
-
-            Transaction::create([
-                'account_id' => $account->id,
-                'user_id' => auth()->id(),
-                'amount' => $validatedData['amount'],
-                'type_id' => 2, // 1 - platba, 2 - vklad
-                'description' => $validatedData['description'],
-            ]);
+                Transaction::create([
+                    'account_id' => $account->id,
+                    'user_id' => auth()->id(),
+                    'amount' => $validatedData['amount'],
+                    'type_id' => 2, // 1 - platba, 2 - vklad
+                    'description' => $validatedData['description'],
+                ]);
+            } catch (QueryException $e) {
+                return redirect()->back()
+                    ->with('error', 'Při transakci nastala chyba');
+            }
 
             return redirect()->route('accountDetailPage', $account)->with('success', 'Peníze byly úspěšně přidány na účet.');
         } catch (ValidationException $e) {
@@ -63,6 +68,12 @@ class TransactionController extends Controller
 
             $account->lockForUpdate(); // zámek pro aktualizaci účtu
             $recipient = Account::where('id', $validatedData['recipient'])->first();
+            if ($recipient === $account) {
+                return redirect()->back()
+                    ->with('error', 'Nemůžete poslat peníze na svůj vlastní účet.')
+                    ->withInput()
+                    ->with('modal', 'sendPaymentModal');
+            }
             if ($recipient) {
                 $recipient->lockForUpdate();
             } // zámek pro příjemce, pokud existuje
@@ -88,7 +99,6 @@ class TransactionController extends Controller
             ]);
 
             $account->save();
-
 
             if ($recipient) {
                 // změna balance na přijímajícím účtu, pokud je v db (jinak to jde do "světa")

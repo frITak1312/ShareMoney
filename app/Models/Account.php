@@ -6,8 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Account extends Model
 {
+    public $incrementing = false;
+
+    protected $keyType = 'int';
+
     protected $fillable
         = [
+            'id',
             'name',
             'balance',
         ];
@@ -32,15 +37,22 @@ class Account extends Model
         return $membership?->pivot?->role;
     }
 
+    public function isMember($userId)
+    {
+        return $this->users->contains('id', $userId);
+    }
+
     public function transactions()
     {
         return Transaction::where(function ($query) {
             $query->where('account_id', $this->id)
-                ->orWhere(function ($query2) {
-                    $query2->where('recipient_account_id', $this->id)
-                        ->where('amount', '>', 0);
-                });
-        })->orderBy('created_at', 'desc')->get();
+                ->whereNotNull('user_id');
+        })
+            ->orWhere(function ($query) {
+                $query->where('recipient_account_id', $this->id)
+                    ->whereNull('user_id');
+            })
+            ->orderBy('created_at', 'desc')
+            ->get();
     }
-
 }

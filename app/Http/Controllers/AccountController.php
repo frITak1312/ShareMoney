@@ -3,73 +3,22 @@
 namespace App\Http\Controllers;
 
 use App\Models\Account;
-use App\Models\User;
+use Illuminate\Database\QueryException;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Validator;
 
 class AccountController extends Controller
 {
     public function index(Account $account)
     {
-        return view('account', compact('account'));
-    }
-
-    public function removeUser(Account $account)
-    {
-        $user = auth()->user();
-
-        if ($account->users()->where('user_id', $user->id)->exists()) {
-            $account->users()->detach($user->id);
-
-            return redirect()->route('dashboardPage')->with('success', 'Opustili jste účet.');
+        if (! $account->isMember(auth()->user()->id)) {
+            abort(403);
         }
 
-        return redirect()->route('accountDetailPage', $account)
-            ->with('error', 'Nemáte oprávnění opustit tento účet.')
-            ->with('modal', 'leaveAccountModal');
-    }
+        $transactions = $account->transactions();
 
-    public function addMember(Account $account, Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'userName' => 'required',
-        ], [
-            'userName.required' => 'Uživatelské jméno nesmí být prázdné.',
-        ]);
-        if ($validator->fails()) {
-            return redirect()->back()
-                ->withErrors($validator)
-                ->with('modal', 'addMemberModal');
-        }
+        $accountMembers = $account->users;
 
-        $userName = $request->input('userName');
-        $userName = ltrim($userName, '@');
-
-        if (! User::getUserByUsername($userName)) {
-            return redirect()->back()
-                ->withErrors(['userName' => 'Uživatel s tímto uživatelským jménem neexistuje.'])
-                ->with('modal', 'addMemberModal');
-        }
-
-        $user = User::getUserByUsername($userName);
-
-        // Kontrola: přidává sám sebe
-        if ($user->id === auth()->id()) {
-            return redirect()->back()
-                ->withErrors(['userName' => 'Nemůžete přidat sám sebe.'])
-                ->with('modal', 'addMemberModal');
-        }
-
-        // Kontrola: už je členem
-        if ($account->users()->where('user_id', $user->id)->exists()) {
-            return redirect()->back()
-                ->withErrors(['userName' => 'Tento uživatel je již členem účtu.'])
-                ->with('modal', 'addMemberModal');
-        }
-
-        $account->users()->attach($user->id);
-
-        return redirect()->route('accountDetailPage', $account)->with('success', 'Uživatel byl úspěšně přidán do účtu.');
+        return view('account', compact('account', 'accountMembers', 'transactions'));
     }
 
     public function deleteAccount(Account $account)
@@ -95,9 +44,9 @@ class AccountController extends Controller
         return redirect()->route('dashboardPage')->with('success', 'Účet byl úspěšně smazán.');
     }
 
-    public function create()
+    public function create(Request $request)
     {
-        $validatedData = request()->validate([
+        $validatedData = $request->validate([
             'name' => 'required|string|max:15',
         ], [
             'name.required' => 'Název účtu je povinný.',
@@ -105,16 +54,60 @@ class AccountController extends Controller
             'name.max' => 'Název účtu nesmí být delší než 15 znaků.',
         ]);
 
-        $account = Account::create([
-            'name' => $validatedData['name'],
+        try {
+            $account = Account::create([
+                'id' => $this->generateAccountId(),
+                'name' => $validatedData['name'],
+            ]);
+
+            $account->users()->attach(auth()->id(), [
+                'role' => 'admin',
+                'joined_at' => now(),
+            ]);
+
+            return redirect()->route('accountDetailPage', $account)->with('success', 'Účet byl úspěšně vytvořen.');
+        } catch (QueryException $exception) {
+            // chyby když mám už v db učet s tímto id (23000 - SQL , 1062 - MySQL)
+            if ($exception->getCode() === '23000' || $exception->getCode() === '1062') {
+                return $this->create($request);
+            }
+
+            // Pokud se nepodařilo vytvořit členství, smažeme účet
+            if (isset($account)) {
+                $account->delete();
+            }
+
+            return redirect()->back()->with('error', 'Nepodařilo se vytvořit účet nebo přidat členství.');
+        }
+    }
+
+    private function generateAccountId()
+    {
+        do {
+            $id = mt_rand(100000000, 999999999);
+        } while (Account::where('id', $id)->exists());
+
+        return $id;
+    }
+
+    public function editName(Account $account, Request $request)
+    {
+        if (! $account->isMember(auth()->user()->id)) {
+            abort(403);
+        }
+
+        $name = $request->validate([
+            'name' => 'required|string|max:15',
+        ], [
+            'name.required' => 'Název účtu nesmí býtr prázdný.',
+            'name.string' => 'Název účtu musí být text.',
+            'name.max' => 'Název účtu nesmí být delší než 15 znaků.',
         ]);
 
-        $account->users()->attach(auth()->id(), [
-            'role' => 'admin',
-        ]);
-
+        $account->name = $request->name;
         $account->save();
 
-        return redirect()->route('accountDetailPage', $account)->with('success', 'Účet byl úspěšně vytvořen.');
+        return redirect()->route('accountDetailPage', $account)
+            ->with('success', 'Název účtu byl úspěšně změněn.');
     }
 }

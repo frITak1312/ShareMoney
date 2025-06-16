@@ -12,27 +12,15 @@ class Transaction extends Model
 
     protected $fillable = [
         'account_id',
-        'user_id',
         'recipient_account_id',
+        'user_id',
         'type_id',
         'amount',
         'description',
-        'type_id',
     ];
-
-    public function account()
-    {
-        return $this->belongsTo(Account::class);
-    }
-
-    public function recipientAccount()
-    {
-        return $this->belongsTo(Account::class, 'recipient_account_id');
-    }
 
     public function user()
     {
         return $this->belongsTo(User::class);
     }
-
 }

@@ -12,7 +12,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     @yield('custom-css')
 </head>
-<body class="bg-primary" style="font-family: Kanit, sans-serif;">
+<body class="" style="font-family: Kanit, sans-serif; ">
 <nav class="navbar navbar-expand-md bg-secondary d-flex justify-content-between align-items-center">
     <div class="container-fluid">
         <a href="{{ route('dashboardPage') }}"
@@ -30,7 +30,7 @@
                         <ul class="dropdown-menu dropdown-menu-end" style="min-width: unset">
                             <li>
                                 <a class="dropdown-item"
-                                   href="{{route('profileDetailPage',['user' => auth()->user()],)}}">
+                                   href="{{route('profileDetailPage',['user' => auth()->user()])}}">
                                     <i class="fa fa-edit"></i> Můj profil
                                 </a></li>
                             <li>
@@ -59,7 +59,10 @@
             Zpět
         </a>
     @endif
-    <h1 class="display-4">@yield("heading")</h1>
+    <div class="d-flex">
+        <h1 class="display-4">@yield("heading")</h1>
+        @yield("editBtn")
+    </div>
     @if(session('success'))
         <x-toast />
     @endif

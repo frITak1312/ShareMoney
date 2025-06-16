@@ -12,6 +12,7 @@ export default defineConfig({
                 "resources/js/editProfilePhoto.js",
                 "resources/js/accountDetail.js",
                 "resources/js/dashboard.js",
+                "resources/js/memberManagement.js",
             ],
             refresh: true,
         }),

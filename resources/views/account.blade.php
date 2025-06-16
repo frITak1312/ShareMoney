@@ -5,23 +5,24 @@
     <link rel="stylesheet" href="https://cdn.datatables.net/2.3.1/css/dataTables.bootstrap5.css" />
     <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.2/css/buttons.bootstrap5.min.css" />
 @endsection
-
+@php
+    $userId = auth()->id();
+    $role = $account->getUserRole($userId);
+@endphp
 @section("heading", $account->name)
-
+@if($role === "admin")
+    @section("editBtn")
+        <button class="btn" id="edit-account-name-btn"><i class="far fa-edit editIcon"></i></button>
+    @endsection
+@endif
 @section("content")
-    @php
-        $userId = auth()->id();
-        $role = $account->getUserRole($userId);
-        $accountMembers = $account->users;
-        $transactions = $account->transactions();
-    @endphp
 
-    <h3 style="color: rgb(163,163,163);font-size: 20px;margin-bottom: 40px;">
-        vlastník: &nbsp;{{ $account->admin_name }}
+    <h3 style="color: rgb(114,114,114);font-size: 20px;margin-bottom: 40px;">
+        číslo účtu: &nbsp;{{ $account->id }}
     </h3>
 
     <p class="lead text-center text-success" style="font-size: 45px;margin-bottom: 26px;">
-        {{ $account->balance }} CZK
+        <strong>{{ $account->balance }} CZK</strong>
     </p>
     <div class="d-flex gap-5 align-items-center">
         @if($role === "member")
@@ -38,7 +39,7 @@
     </div>
     <!-- Tabulka výpisu -->
     <div class="container mt-5" style="width: 50%;">
-        <div class="table-responsive">
+        <div>
             <table id="transaction-history-table" class="table table-striped nowrap">
                 <thead>
                 <tr>
@@ -51,7 +52,7 @@
                 </thead>
                 <tbody>
                 @foreach($transactions as $transaction)
-                    <tr class={{$transaction->amount > 0 ? "negative-row" : "positive-row"}}>
+                    <tr class="{{$transaction->amount > 0 ? "positive-row" : "negative-row"}}">
                         <td>{{date_format(date_create($transaction->created_at), "d.m.y H:i")}}</td>
                         <td>
                             @if($transaction->type_id === 1)
@@ -80,14 +81,15 @@
     <div class="sidebar" id="sidebar">
         @if($role === "admin")
             <div class="divider p-3 text-center">
-                <a href="#" class="btn btn-info btn-lg" role="button">Spravovat účet</a>
+                <a href="{{route('memberManagementPage',["account" => $account])}}" class="btn btn-info btn-lg"
+                   role="button">Správa členů</a>
             </div>
         @endif
 
         @if($role !== "member")
             <div class="text-center mt-4">
                 <button class="btn-outline-info btn btn-lg mb-3" id="add-member-btn">
-                    Přidat člena <i class="fas fa-plus-square"></i>
+                    <i class="fa fa-plus"></i> Přidat člena
                 </button>
             </div>
         @endif
@@ -98,7 +100,7 @@
             @foreach($accountMembers as $member)
                 @php
                     $memberRole = $member->pivot->role;
-                    $dateJoined = date_format(date_create($member->pivot->joined_at), "d.m.Y");
+                    $dateJoined = date_format(date_create($member->joined_at), "d.m.Y");
                     $roleColors = ['admin' => 'red', 'moderator' => 'orange', 'member' => 'black'];
                     $color = $roleColors[$memberRole];
                     $src = empty($member->avatar_path)
@@ -129,9 +131,20 @@
             </p>
         </footer>
     </div>
-
+    <!-- Změnit název účtu -->
+    <x-modal-form heading="Změnit název účtu" id="editAccountNameModal" class="modal-lg"
+                  :action="route('editAccountName', $account)">
+        @method("PUT")
+        <p>Zadejte nový název</p>
+        <input type="text" name="name" id="accountNameInput" placeholder="Název účtu"
+               value="{{ old("name") ?? $account->name  }}" required>
+        <div class="d-flex justify-content-center gap-3 mt-4">
+            <button type="submit" class="btn btn-secondary">Změnit</button>
+            <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Zrušit</button>
+        </div>
+    </x-modal-form>
     <!-- Opustit učet modal -->
-    <x-modal-form heading="Opustit účet" :action="route('removeUserFromAccount', $account)" id="leaveAccountModal"
+    <x-modal-form heading="Opustit účet" :action="route('removeMemberFromAccount', $account)" id="leaveAccountModal"
                   class="modal-lg">
         @method("DELETE")
         <p>Opravdu si přejete opustit tento účet?</p>
@@ -170,7 +183,7 @@
     <x-modal-form heading="Vložit peníze" :action="route('depositMoney', $account)" id="depositMoneyModal"
                   class="modal-lg">
         <label for="depositAmount">Částka:
-            <input type="number" id="depositAmount" name="amount" placeholder="Částka v CZK" required
+            <input type="number" id="depositAmount" name="amount" min="1" placeholder="Částka v CZK" required
                    value="{{ old('amount') }}">
         </label>
         @error('amount')
@@ -191,6 +204,7 @@
     <!-- Info o uživateli modal -->
     <x-modal-form heading="Informace o uživateli" id="userInfoModal"
                   class="modal-lg">
+        @method("GET")
         <table class="table table-hover table-striped">
             <tr>
                 <th>Jméno</th>

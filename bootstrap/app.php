@@ -1,9 +1,9 @@
 <?php
 
-use App\Http\Middleware\EnsureUserIsAuthenticated;
+use App\Http\Middleware\Authenticated;
+use App\Http\Middleware\CheckIdentity;
+use App\Http\Middleware\CheckRole;
 use App\Http\Middleware\StoreReturnUrl;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -17,11 +17,12 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'loggedIn' => EnsureUserIsAuthenticated::class,
+            'auth' => Authenticated::class,
+            'role' => CheckRole::class,
+            'identity' => CheckIdentity::class,
         ]);
+
         $middleware->append([
-            EncryptCookies::class,
-            AddQueuedCookiesToResponse::class,
             StartSession::class,
             StoreReturnUrl::class,
         ]);

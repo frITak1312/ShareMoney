@@ -20,7 +20,7 @@ class StoreReturnUrl
             ! $request->is('/') &&
             ! $request->ajax()) {
 
-            session(['return_url' => url()->previous()]);
+            session(['return_url' => url()->full()]);
 
             if (str_contains(session('return_url'), 'editProfile')) {
                 session()->forget('return_url');

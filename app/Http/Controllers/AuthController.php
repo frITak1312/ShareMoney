@@ -46,7 +46,7 @@ class AuthController extends Controller
         return redirect()->route('dashboardPage');
     }
 
-    public function createUsername($name, $surname): string
+    private function createUsername($name, $surname): string
     {
         $random = rand(101, 999);
 

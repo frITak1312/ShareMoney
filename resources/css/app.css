@@ -1,6 +1,6 @@
-@import 'bootstrap/dist/css/bootstrap.min.css';
-@import '/resources/css/animate.min.css';
-@import '/resources/css/bs-theme-overrides.css';
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "/resources/css/animate.min.css";
+@import "/resources/css/bs-theme-overrides.css";
 
 :root {
     --background-color: #fdfcf7 !important;
@@ -41,8 +41,10 @@ input {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
 }
 
-td {
+td, .dt-type-numeric {
     word-break: break-word;
+    vertical-align: middle;
+    text-align: center !important;
 }
 
 .divider {

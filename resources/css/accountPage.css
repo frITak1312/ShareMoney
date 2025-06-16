@@ -1,5 +1,6 @@
 .sidebar {
-    width: 300px;
+    width: auto;
+    max-width: 350px;
     border-left: 1px solid #e5e7eb;
     height: calc(100vh - 60px);
     position: fixed;
@@ -58,8 +59,8 @@
     transition: transform 0.3s ease;
 }
 
-.zoom-hover:hover {
-    transform: scale(1.05); /* Mírné přiblížení o 5 % */
+.zoom-hover:hover, .editIcon:hover {
+    transform: scale(1.05);
 }
 
 .export-btn,
@@ -83,6 +84,7 @@
     color: rgb(6, 210, 6) !important;
 }
 
-#transaction-history-table {
-    font-size: large;
+input[type="search"] {
+    max-width: 50% !important;
 }
+
