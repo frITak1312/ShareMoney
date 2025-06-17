@@ -53,7 +53,7 @@ CREATE TABLE `account_memberships` (
   `id` int(11) NOT NULL,
   `account_id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL,
-  `role` enum('admin','moderator','user') NOT NULL DEFAULT 'user',
+  `role` enum('admin','moderator','member') NOT NULL DEFAULT 'member',
   `joined_at` datetime NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

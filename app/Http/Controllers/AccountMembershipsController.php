@@ -31,12 +31,11 @@ class AccountMembershipsController extends Controller
 
     public function leaveAccount(Account $account)
     {
-        if ($account->users()->where('user_id', auth()->id)->exists()) {
-            $account->users()->detach(auth()->id);
-
+        if ($account->users()->detach(auth()->id())) {
             return redirect()->route('dashboardPage')
                 ->with('success', 'Opustili jste účet.');
         }
+
 
         return redirect()->route('accountDetailPage', $account)
             ->with('error', 'Nemůžete opustit tento účet.')
