@@ -216,14 +216,14 @@ ALTER TABLE `users`
 --
 ALTER TABLE `account_memberships`
   ADD CONSTRAINT `account_memberships_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`) ON DELETE CASCADE,
-  ADD CONSTRAINT `account_memberships_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `members` (`id`) ON DELETE CASCADE;
+  ADD CONSTRAINT `account_memberships_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
 -- Omezení pro tabulku `transactions`
 --
 ALTER TABLE `transactions`
   ADD CONSTRAINT `transactions_ibfk_1` FOREIGN KEY (`account_id`) REFERENCES `accounts` (`id`),
-  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `members` (`id`),
+  ADD CONSTRAINT `transactions_ibfk_2` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
   ADD CONSTRAINT `transactions_ibfk_3` FOREIGN KEY (`type_id`) REFERENCES `transaction_types` (`id`);
 COMMIT;
 

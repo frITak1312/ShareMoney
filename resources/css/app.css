@@ -57,3 +57,7 @@ td, .dt-type-numeric {
     height: 50px;
     border-radius: 50%;
 }
+
+.toast-message {
+    z-index: 999;
+}

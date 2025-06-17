@@ -144,7 +144,7 @@
         </div>
     </x-modal-form>
     <!-- Opustit učet modal -->
-    <x-modal-form heading="Opustit účet" :action="route('removeMemberFromAccount', $account)" id="leaveAccountModal"
+    <x-modal-form heading="Opustit účet" :action="route('leaveAccount', $account)" id="leaveAccountModal"
                   class="modal-lg">
         @method("DELETE")
         <p>Opravdu si přejete opustit tento účet?</p>

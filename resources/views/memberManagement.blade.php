@@ -11,9 +11,9 @@
         účet: &nbsp;{{ $account->name }}
     </h3>
 
-    <div class="container mt-5" style="width: auto; max-width: 1000px">
+    <div class="container mt-5" style="max-width: 1000px">
         <table id="member-management-table" class="table nowrap table-hover table-bordered">
-            
+
             <thead>
             <tr>
                 <th>#</th>

@@ -54,7 +54,7 @@
     class="d-flex position-relative d-lg-flex flex-column justify-content-center align-items-center justify-content-lg-center align-items-lg-center"
     style="margin: 50px 80px 0;">
     @if(! request()-> is("dashboard"))
-        <a href="{{session('return_url', route("dashboardPage"))}}" class="back-arrow">
+        <a href="{{ request()->is('accountDetail/*') ? route('dashboardPage') : session('return_url') }}" class="back-arrow">
             <i class="fas fa-arrow-left"></i>
             Zpět
         </a>

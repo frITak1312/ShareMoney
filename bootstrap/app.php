@@ -7,7 +7,6 @@ use App\Http\Middleware\StoreReturnUrl;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use Illuminate\Session\Middleware\StartSession;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -16,16 +15,20 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
+        
+        // Přidat pouze do web routes
+        $middleware->web(append: [
+            \App\Http\Middleware\StoreReturnUrl::class,
+        ]);
+        
+        // Aliasy pro použití v routách
         $middleware->alias([
             'auth' => Authenticated::class,
             'role' => CheckRole::class,
             'identity' => CheckIdentity::class,
         ]);
-
-        $middleware->append([
-            StartSession::class,
-            StoreReturnUrl::class,
-        ]);
+        
+        // ODSTRANĚNO: $middleware->append([StoreReturnUrl::class,]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //

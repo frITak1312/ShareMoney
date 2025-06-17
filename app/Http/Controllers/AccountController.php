@@ -67,7 +67,7 @@ class AccountController extends Controller
 
             return redirect()->route('accountDetailPage', $account)->with('success', 'Účet byl úspěšně vytvořen.');
         } catch (QueryException $exception) {
-            // chyby když mám už v db učet s tímto id (23000 - SQL , 1062 - MySQL)
+            // chyba když v DB je učet s tímto id (23000 - SQL , 1062 - MySQL)
             if ($exception->getCode() === '23000' || $exception->getCode() === '1062') {
                 return $this->create($request);
             }

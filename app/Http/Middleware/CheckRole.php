@@ -7,20 +7,22 @@ use Illuminate\Http\Request;
 
 class CheckRole
 {
-    public function handle(Request $request, Closure $next, string $role)
+    public function handle(Request $request, Closure $next, string ...$roles)
     {
         $account = $request->route('account');
         $user = auth()->user();
         if (! $account) {
-            abort(404, 'Účet nenalezen.');
+            abort(404, 'Účet nebo uživatel nenalezen.');
         }
 
         $membership = $account->getUserRole($user->id);
-        if (! $role) {
+        if (! $membership) {
             abort(403, 'Nejste členem tohoto účtu.');
+        } elseif (empty($role)) {
+            return $next($request);
         }
 
-        if ($membership !== $role) {
+        if (! in_array($membership->role, $roles)) {
             abort(403, 'Nemáte oprávnění k této akci.');
         }
 

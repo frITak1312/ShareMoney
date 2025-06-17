@@ -25,7 +25,7 @@ class UserController extends Controller
                 'required',
                 'email',
                 'max:255',
-                Rule::unique('members', 'email')->ignore($user->id), // kontrola unikátnosti s ignorováním aktuálního uživatele
+                Rule::unique('users', 'email')->ignore($user->id), // kontrola unikátnosti s ignorováním aktuálního uživatele
             ],
             'password' => 'nullable|string|min:8',
             'avatar' => 'nullable|image|mimes:jpeg,png,jpg',

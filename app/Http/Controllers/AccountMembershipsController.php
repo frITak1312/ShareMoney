@@ -17,23 +17,29 @@ class AccountMembershipsController extends Controller
         return view('memberManagement', compact('account', 'members'));
     }
 
-    public function removeMember(Account $account, ?User $user = null)
+    public function removeMember(Account $account, User $user)
     {
-        $user = $user ?? auth()->user();
-
         if ($account->users()->where('user_id', $user->id)->exists()) {
+
             $account->users()->detach($user->id);
-            // pokud se jedná o odebrání usera v managementu $user nebude auth()->user() protože to je v tu chvíli admin
-            if ($user !== auth()->user()) {
-                return redirect()->back()->with('success', 'Člen byl odebrán.');
-            }
+
+            return redirect()->back()->with('success', 'Člen byl odebrán.');
+        }
+
+        return redirect()->back()->with('error', 'Akce se nezdařila.');
+    }
+
+    public function leaveAccount(Account $account)
+    {
+        if ($account->users()->where('user_id', auth()->id)->exists()) {
+            $account->users()->detach(auth()->id);
 
             return redirect()->route('dashboardPage')
                 ->with('success', 'Opustili jste účet.');
         }
 
         return redirect()->route('accountDetailPage', $account)
-            ->with('error', 'Nemáte oprávnění opustit tento účet.')
+            ->with('error', 'Nemůžete opustit tento účet.')
             ->with('modal', 'leaveAccountModal');
     }
 
@@ -97,8 +103,10 @@ class AccountMembershipsController extends Controller
             return redirect()->back()
                 ->withErrors($validator);
         }
-        $account->users()->updateExistingPivot($user->id, ['role' => $request->input('role')]);
+        $account->users()
+            ->updateExistingPivot($user->id, ['role' => $request->input('role')]);
 
-        return redirect()->back()->with('success', 'Role člena byla úspěšně změněna.');
+        return redirect()->back()
+            ->with('success', 'Role člena byla úspěšně změněna.');
     }
 }
